@@ -3,391 +3,410 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bild-Sortierer Pro v0.1 beta</title>
-    <!-- JSZip Bibliothek für den lokalen Export -->
+    <title>Image Sorter Pro v0.1 beta | cali72mero</title>
+    <!-- JSZip für den lokalen Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root {
-            --bg-color: #121212;
-            --container-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --accent-sfw: #4caf50;
-            --accent-nsfw: #f44336;
-            --accent-neutral: #2196f3;
+            --bg-dark: #0a0a0a;
+            --panel-bg: #141414;
+            --text-primary: #e5e5e5;
+            --text-secondary: #a3a3a3;
+            --accent-sfw: #22c55e;
+            --accent-nsfw: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-undo: #737373;
+            --border-color: #262626;
         }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100vh;
             overflow: hidden;
         }
 
-        /* --- Ursprünglicher Header --- */
+        /* --- Header & Stats --- */
         header {
-            padding: 1rem;
-            background-color: var(--container-bg);
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #333;
         }
 
-        .header-brand { display: flex; align-items: center; gap: 15px; }
-        .lang-toggle { cursor: pointer; color: var(--accent-neutral); font-weight: bold; border: 1px solid var(--accent-neutral); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .brand h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.025em; }
+        .brand span { font-size: 0.75rem; color: var(--text-secondary); }
 
-        .stats {
-            display: flex;
-            gap: 20px;
-            font-size: 0.9rem;
-        }
+        .stats-bar { display: flex; gap: 1.5rem; font-size: 0.85rem; }
+        .stat-item span { color: var(--text-secondary); margin-right: 4px; }
+        .stat-val { font-weight: 600; }
 
-        /* --- Ursprüngliches Layout --- */
-        .main-container {
-            display: flex;
+        /* --- Layout --- */
+        main { display: flex; flex: 1; overflow: hidden; padding: 1rem; gap: 1rem; }
+
+        .viewer-container {
             flex: 1;
-            padding: 20px;
-            gap: 20px;
-            overflow: hidden;
-        }
-
-        .viewer-section {
-            flex: 2;
+            background-color: #000;
+            border-radius: 12px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #000;
-            border-radius: 8px;
             position: relative;
-            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
         }
 
-        #current-image {
+        #main-display {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            display: none;
         }
 
-        .controls-section {
-            flex: 1;
+        .welcome-hero { text-align: center; max-width: 400px; }
+        .welcome-hero h2 { margin-bottom: 0.5rem; color: #fff; }
+        .welcome-hero p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; }
+
+        .sidebar {
+            width: 320px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            max-width: 300px;
+            gap: 1rem;
         }
 
+        .card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        /* --- Buttons & Inputs --- */
         .btn {
-            padding: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-            color: white;
             width: 100%;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #fff;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-
         .btn:active { transform: scale(0.98); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
 
         .btn-sfw { background-color: var(--accent-sfw); }
         .btn-nsfw { background-color: var(--accent-nsfw); }
-        .btn-neutral { background-color: var(--accent-neutral); }
-        .btn-danger { background-color: #555; }
+        .btn-undo { background-color: var(--accent-undo); }
+        .btn-export { background-color: var(--accent-blue); }
+        .btn-ghost { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.75rem; padding: 0.5rem; }
 
-        .upload-area {
-            border: 2px dashed #444;
-            padding: 20px;
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            padding: 1.5rem;
             text-align: center;
-            border-radius: 8px;
-            background: var(--container-bg);
+            border-radius: 10px;
             cursor: pointer;
+            transition: border-color 0.2s;
         }
+        .upload-zone:hover { border-color: var(--accent-blue); }
 
-        .shortcuts-info {
+        /* --- Export Section --- */
+        .export-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
+        .export-small { padding: 8px; font-size: 0.75rem; margin-bottom: 0; }
+
+        .shortcuts-hint {
             margin-top: auto;
-            padding: 10px;
-            background: #252525;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            color: #888;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
         }
 
-        /* --- Overlay --- */
-        #loading-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+        /* --- Overlays --- */
+        #loader {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
         }
-
         .spinner {
-            width: 50px; height: 50px;
-            border: 5px solid #333;
-            border-top: 5px solid var(--accent-neutral);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+            width: 40px; height: 40px; border: 3px solid #222;
+            border-top-color: var(--accent-blue); border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="header-brand">
-        <div><strong>Bild-Sortierer Pro</strong> <small>v0.1 beta</small></div>
-        <div id="lang-btn" class="lang-toggle" onclick="toggleLanguage()">EN</div>
+    <div class="brand">
+        <h1>Image Sorter Pro</h1>
+        <span>v0.1 beta | cali72mero</span>
     </div>
     
-    <div class="stats">
-        <span><span data-t="total">Gesamt</span>: <span id="stat-total">0</span></span>
-        <span><span data-t="open">Offen</span>: <span id="stat-remaining">0</span></span>
-        <span>SFW: <span id="stat-sfw">0</span></span>
-        <span>NSFW: <span id="stat-nsfw">0</span></span>
+    <div class="stats-bar">
+        <div class="stat-item"><span data-t="total">Gesamt:</span><span id="s-total" class="stat-val">0</span></div>
+        <div class="stat-item"><span data-t="open">Offen:</span><span id="s-open" class="stat-val">0</span></div>
+        <div class="stat-item"><span>SFW:</span><span id="s-sfw" class="stat-val">0</span></div>
+        <div class="stat-item"><span>NSFW:</span><span id="s-nsfw" class="stat-val">0</span></div>
     </div>
-    <button class="btn btn-danger" onclick="clearAllData()" style="padding: 5px 10px; font-size: 0.8rem; width: auto;" data-t="btn_clear">Daten löschen</button>
+
+    <button class="btn-ghost" onclick="dbReset()" data-t="clear">Daten löschen</button>
 </header>
 
-<div class="main-container">
-    <div class="viewer-section">
-        <div id="welcome-msg" style="text-align: center; padding: 20px;">
-            <h2 data-t="welcome_title">Willkommen!</h2>
-            <p data-t="welcome_desc">Lade einen Ordner hoch, um mit der Sortierung zu beginnen.</p>
+<main>
+    <div class="viewer-container">
+        <div id="welcome" class="welcome-hero">
+            <h2 data-t="welcome_h">Bereit zum Sortieren?</h2>
+            <p data-t="welcome_p">Wähle einen Ordner mit Bildern aus. Die Verarbeitung erfolgt vollständig lokal.</p>
         </div>
-        <img id="current-image" style="display: none;">
+        <img id="main-display" alt="Preview">
     </div>
 
-    <div class="controls-section">
-        <div class="upload-area" onclick="document.getElementById('file-input').click()">
-            <p data-t="upload_text">Ordner auswählen</p>
-            <button class="btn btn-neutral" style="padding: 10px; font-size: 0.9rem;" data-t="btn_upload">Hochladen</button>
-            <input type="file" id="file-input" webkitdirectory directory multiple style="display: none;">
+    <aside class="sidebar">
+        <div class="card">
+            <div class="upload-zone" onclick="document.getElementById('input-dir').click()">
+                <p data-t="upload_t" style="font-size: 0.9rem; font-weight: 500;">Ordner auswählen</p>
+                <p style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">Inkl. Unterordner</p>
+                <input type="file" id="input-dir" webkitdirectory directory multiple class="hidden">
+            </div>
         </div>
 
-        <button id="btn-sfw" class="btn btn-sfw" onclick="sortImage('sfw')" disabled data-t="btn_sfw">SFW (S)</button>
-        <button id="btn-nsfw" class="btn btn-nsfw" onclick="sortImage('nsfw')" disabled data-t="btn_nsfw">NSFW (N)</button>
-        <button id="btn-undo" class="btn btn-danger" onclick="undoLast()" disabled data-t="btn_undo">Rückgängig (Z)</button>
-        
-        <hr style="width: 100%; border: 0; border-top: 1px solid #333; margin: 10px 0;">
-        
-        <button id="btn-download" class="btn btn-neutral" onclick="downloadZip()" disabled data-t="btn_zip">ZIP Herunterladen</button>
-
-        <div class="shortcuts-info">
-            <strong>Shortcuts:</strong><br>
-            S = SFW | N = NSFW | Z = Undo<br>
-            <span data-t="info_ram">Optimiert für wenig RAM</span>
+        <div class="card">
+            <button id="b-sfw" class="btn btn-sfw" onclick="decide('sfw')" disabled>
+                <span data-t="btn_sfw">SFW (Links)</span>
+            </button>
+            <button id="b-nsfw" class="btn btn-nsfw" onclick="decide('nsfw')" disabled>
+                <span data-t="btn_nsfw">NSFW (Rechts)</span>
+            </button>
+            <button id="b-undo" class="btn btn-undo" onclick="undo()" disabled>
+                <span data-t="btn_undo">Rückgängig (Oben)</span>
+            </button>
         </div>
-    </div>
-</div>
 
-<div id="loading-overlay">
+        <div class="card" style="margin-top: auto;">
+            <p style="font-size: 0.8rem; margin-bottom: 0.75rem; font-weight: 600;" data-t="export_h">Exportieren</p>
+            <button id="b-zip" class="btn btn-export" onclick="exportZip()" disabled data-t="btn_zip">ZIP (Chunked)</button>
+            
+            <div class="export-options">
+                <button id="b-sh" class="btn btn-ghost export-small" onclick="exportScript('sh')" disabled>Skript (.sh)</button>
+                <button id="b-bat" class="btn btn-ghost export-small" onclick="exportScript('bat')" disabled>Skript (.bat)</button>
+            </div>
+        </div>
+
+        <div class="shortcuts-hint">
+            ⬅️ SFW | ➡️ NSFW | ⬆️ Undo<br>
+            <span data-t="ram_opt">Memory-Safe & Low-RAM Optimiert</span>
+        </div>
+    </aside>
+</main>
+
+<div id="loader">
     <div class="spinner"></div>
-    <p id="loading-text" style="margin-top: 20px;">Verarbeite Bilder...</p>
+    <p id="loader-msg" style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">Verarbeite...</p>
 </div>
 
 <script>
-    /* --- Sprach-Management --- */
-    let currentLang = 'de';
-    const translations = {
-        de: {
-            total: "Gesamt", open: "Offen", btn_clear: "Daten löschen",
-            welcome_title: "Willkommen!", welcome_desc: "Lade einen Ordner hoch, um zu beginnen.",
-            upload_text: "Ordner auswählen", btn_upload: "Hochladen",
-            btn_sfw: "SFW (S)", btn_nsfw: "NSFW (N)", btn_undo: "Rückgängig (Z)",
-            btn_zip: "ZIP Herunterladen", info_ram: "Optimiert für wenig RAM",
-            done_title: "Fertig!", done_desc: "Alle Bilder sind sortiert. Lade jetzt das ZIP herunter.",
-            msg_import: "Importiere Bilder...", msg_zip: "ZIP wird erstellt...",
-            confirm: "Alle Daten wirklich löschen?"
-        },
-        en: {
-            total: "Total", open: "Open", btn_clear: "Clear Data",
-            welcome_title: "Welcome!", welcome_desc: "Upload a folder to start sorting.",
-            upload_text: "Select Folder", btn_upload: "Upload",
-            btn_sfw: "SFW (S)", btn_nsfw: "NSFW (N)", btn_undo: "Undo (Z)",
-            btn_zip: "Download ZIP", info_ram: "Low RAM optimization",
-            done_title: "Done!", done_desc: "All images sorted. Download your ZIP now.",
-            msg_import: "Importing images...", msg_zip: "Creating ZIP...",
-            confirm: "Really clear all data?"
-        }
-    };
-
-    /* --- App Logik (IndexedDB & State) --- */
-    let db;
-    let imageList = [];
-    let currentIndex = -1;
+    /* --- State Management --- */
+    let files = [];
+    let decisions = {}; // path -> 'sfw' | 'nsfw'
     let history = [];
+    let currentIndex = -1;
+    let currentObjectUrl = null;
 
-    const initDB = () => {
-        const req = indexedDB.open("ImageSorterDB", 1);
-        req.onupgradeneeded = (e) => {
-            const d = e.target.result;
-            if (!d.objectStoreNames.contains("images")) {
-                d.createObjectStore("images", { keyPath: "id", autoIncrement: true });
-            }
-        };
-        req.onsuccess = (e) => {
-            db = e.target.result;
-            loadFromDB();
-        };
+    const i18n = {
+        de: {
+            total: "Gesamt:", open: "Offen:", clear: "Daten löschen",
+            welcome_h: "Bereit zum Sortieren?", welcome_p: "Wähle einen Ordner aus. Die Verarbeitung erfolgt lokal.",
+            upload_t: "Ordner auswählen", btn_sfw: "SFW (Links)", btn_nsfw: "NSFW (Rechts)",
+            btn_undo: "Rückgängig (Oben)", export_h: "Exportieren", btn_zip: "ZIP (Chunked)",
+            ram_opt: "Memory-Safe & Low-RAM Optimiert", done_h: "Alle sortiert!",
+            done_p: "Nutze die Export-Optionen rechts, um deine Auswahl zu speichern.",
+            msg_load: "Bilder werden indiziert...", msg_zip: "Erstelle ZIP-Paket...", confirm: "Alle Daten löschen?"
+        }
     };
 
-    async function handleFileUpload(e) {
-        const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-        if (!files.length) return;
+    /* --- Core Logic --- */
+    async function handleFiles(e) {
+        const raw = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+        if (!raw.length) return;
 
-        showLoading(true, translations[currentLang].msg_import);
-        const tx = db.transaction("images", "readwrite");
-        const store = tx.objectStore("images");
-
-        for (const f of files) {
-            store.add({ name: f.name, data: f, tag: null });
-        }
+        setLoader(true, i18n.de.msg_load);
+        files = raw;
+        decisions = {};
+        history = [];
         
-        tx.oncomplete = () => {
-            loadFromDB();
-            showLoading(false);
-        };
+        updateStats();
+        findNext();
+        setLoader(false);
     }
 
-    function loadFromDB() {
-        const tx = db.transaction("images", "readonly");
-        const req = tx.objectStore("images").getAll();
-        req.onsuccess = () => {
-            imageList = req.result;
-            updateStats();
-            findNextImage();
-        };
-    }
+    function findNext() {
+        // Cleanup old memory
+        if (currentObjectUrl) {
+            URL.revokeObjectURL(currentObjectUrl);
+            currentObjectUrl = null;
+        }
 
-    function findNextImage() {
-        currentIndex = imageList.findIndex(img => img.tag === null);
-        const imgEl = document.getElementById('current-image');
-        const welcome = document.getElementById('welcome-msg');
+        currentIndex = files.findIndex(f => !decisions[f.webkitRelativePath]);
+        const img = document.getElementById('main-display');
+        const hero = document.getElementById('welcome');
 
         if (currentIndex !== -1) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imgEl.src = e.target.result;
-                imgEl.style.display = 'block';
-                welcome.style.display = 'none';
-            };
-            reader.readAsDataURL(imageList[currentIndex].data);
-            setButtons(false);
+            currentObjectUrl = URL.createObjectURL(files[currentIndex]);
+            img.src = currentObjectUrl;
+            img.style.display = 'block';
+            hero.style.display = 'none';
+            setControls(false);
         } else {
-            imgEl.style.display = 'none';
-            welcome.style.display = 'block';
-            if (imageList.length > 0) {
-                welcome.querySelector('h2').innerText = translations[currentLang].done_title;
-                welcome.querySelector('p').innerText = translations[currentLang].done_desc;
+            img.style.display = 'none';
+            hero.style.display = 'block';
+            if (files.length > 0) {
+                hero.querySelector('h2').innerText = i18n.de.done_h;
+                hero.querySelector('p').innerText = i18n.de.done_p;
             }
-            setButtons(true);
+            setControls(true);
         }
     }
 
-    function sortImage(tag) {
+    function decide(tag) {
         if (currentIndex === -1) return;
-        const img = imageList[currentIndex];
-        img.tag = tag;
+        const path = files[currentIndex].webkitRelativePath;
+        decisions[path] = tag;
         history.push(currentIndex);
-
-        const tx = db.transaction("images", "readwrite");
-        tx.objectStore("images").put(img);
         
         updateStats();
-        findNextImage();
+        findNext();
     }
 
-    function undoLast() {
+    function undo() {
         if (!history.length) return;
         const lastIdx = history.pop();
-        imageList[lastIdx].tag = null;
-        
-        const tx = db.transaction("images", "readwrite");
-        tx.objectStore("images").put(imageList[lastIdx]);
+        const path = files[lastIdx].webkitRelativePath;
+        delete decisions[path];
 
         updateStats();
-        findNextImage();
+        findNext();
     }
 
-    async function downloadZip() {
-        showLoading(true, translations[currentLang].msg_zip);
-        const zip = new JSZip();
-        const sfw = zip.folder("sfw");
-        const nsfw = zip.folder("nsfw");
+    /* --- Export Logic --- */
+    async function exportZip() {
+        const sorted = files.filter(f => decisions[f.webkitRelativePath]);
+        if (!sorted.length) return;
 
-        imageList.forEach(img => {
-            if (img.tag === 'sfw') sfw.file(img.name, img.data);
-            if (img.tag === 'nsfw') nsfw.file(img.name, img.data);
-        });
+        setLoader(true, i18n.de.msg_zip);
+        
+        const CHUNK_SIZE = 250; // Files per ZIP to prevent RAM crash
+        let currentChunk = 0;
 
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `sorted_images_${Date.now()}.zip`;
-        link.click();
-        showLoading(false);
+        for (let i = 0; i < sorted.length; i += CHUNK_SIZE) {
+            currentChunk++;
+            const zip = new JSZip();
+            const chunk = sorted.slice(i, i + CHUNK_SIZE);
+            
+            chunk.forEach(f => {
+                const tag = decisions[f.webkitRelativePath];
+                // Preserve structure within the tag folder
+                zip.folder(tag).file(f.webkitRelativePath, f);
+            });
+
+            const blob = await zip.generateAsync({ type: "blob" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bundle_${currentChunk}_${Date.now()}.zip`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        setLoader(false);
     }
 
-    /* --- Hilfsfunktionen --- */
+    function exportScript(type) {
+        let content = type === 'bat' ? "@echo off\r\nmkdir nsfw\r\nmkdir sfw\r\n" : "#!/bin/bash\nmkdir -p nsfw sfw\n";
+        
+        for (const f of files) {
+            const tag = decisions[f.webkitRelativePath];
+            if (!tag) continue;
+
+            const path = f.webkitRelativePath;
+            if (type === 'bat') {
+                content += `move "${path}" "${tag}\\${path}"\r\n`;
+            } else {
+                content += `mkdir -p "${tag}/$(dirname "${path}")"\n`;
+                content += `mv "${path}" "${tag}/${path}"\n`;
+            }
+        }
+
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `sort_files.${type}`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    /* --- UI Helpers --- */
     function updateStats() {
-        document.getElementById('stat-total').innerText = imageList.length;
-        document.getElementById('stat-remaining').innerText = imageList.filter(i => i.tag === null).length;
-        document.getElementById('stat-sfw').innerText = imageList.filter(i => i.tag === 'sfw').length;
-        document.getElementById('stat-nsfw').innerText = imageList.filter(i => i.tag === 'nsfw').length;
-        document.getElementById('btn-download').disabled = !imageList.some(i => i.tag !== null);
+        const total = files.length;
+        const solved = Object.keys(decisions).length;
+        const sfw = Object.values(decisions).filter(v => v === 'sfw').length;
+        const nsfw = Object.values(decisions).filter(v => v === 'nsfw').length;
+
+        document.getElementById('s-total').innerText = total;
+        document.getElementById('s-open').innerText = total - solved;
+        document.getElementById('s-sfw').innerText = sfw;
+        document.getElementById('s-nsfw').innerText = nsfw;
+
+        const hasSorted = solved > 0;
+        document.getElementById('b-zip').disabled = !hasSorted;
+        document.getElementById('b-sh').disabled = !hasSorted;
+        document.getElementById('b-bat').disabled = !hasSorted;
     }
 
-    function setButtons(disabled) {
-        document.getElementById('btn-sfw').disabled = disabled;
-        document.getElementById('btn-nsfw').disabled = disabled;
-        document.getElementById('btn-undo').disabled = !history.length;
+    function setControls(disabled) {
+        document.getElementById('b-sfw').disabled = disabled;
+        document.getElementById('b-nsfw').disabled = disabled;
+        document.getElementById('b-undo').disabled = !history.length;
     }
 
-    function toggleLanguage() {
-        currentLang = currentLang === 'de' ? 'en' : 'de';
-        document.getElementById('lang-btn').innerText = currentLang.toUpperCase();
-        document.querySelectorAll('[data-t]').forEach(el => {
-            const key = el.getAttribute('data-t');
-            el.innerText = translations[currentLang][key];
-        });
-        findNextImage();
+    function setLoader(show, msg = "") {
+        const l = document.getElementById('loader');
+        l.style.display = show ? 'flex' : 'none';
+        document.getElementById('loader-msg').innerText = msg;
     }
 
-    function showLoading(show, text) {
-        document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
-        document.getElementById('loading-text').innerText = text;
-    }
-
-    function clearAllData() {
-        if (confirm(translations[currentLang].confirm)) {
-            const tx = db.transaction("images", "readwrite");
-            tx.objectStore("images").clear();
-            tx.oncomplete = () => location.reload();
+    function dbReset() {
+        if (confirm(i18n.de.confirm)) {
+            location.reload();
         }
     }
 
-    /* --- Event Listener --- */
-    document.getElementById('file-input').addEventListener('change', handleFileUpload);
+    /* --- Keyboard Navigation --- */
     window.addEventListener('keydown', (e) => {
         if (currentIndex === -1) return;
-        const key = e.key.toLowerCase();
-        if (key === 's') sortImage('sfw');
-        if (key === 'n') sortImage('nsfw');
-        if (key === 'z') undoLast();
+        if (e.key === 'ArrowLeft') decide('sfw');
+        if (e.key === 'ArrowRight') decide('nsfw');
+        if (e.key === 'ArrowUp' || e.key === 'Backspace') undo();
     });
 
-    initDB();
+    document.getElementById('input-dir').addEventListener('change', handleFiles);
 </script>
 
 </body>

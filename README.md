@@ -1,7 +1,7 @@
 # 🖼️ Image Sorter Pro
 **High-Performance Local Image Categorization Tool**
 
-[![Version](https://img.shields.io/badge/Version-0.1--beta-blue?style=for-the-badge)](https://github.com/cali72mero/bild-sortierung)
+[![Version](https://img.shields.io/badge/Version-0.1--beta-blue?style=for-the-badge)](https://github.com/cali72mero/image-sorting)
 [![License](https://img.shields.io/badge/License-Restricted-red?style=for-the-badge)](#lizenz--license)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-green?style=for-the-badge)](#)
 
@@ -23,11 +23,11 @@
 ### 🚀 Hauptfunktionen
 *   **Zero-Upload-Policy:** Alle Bilder werden rein lokal in deinem Browser verarbeitet. Nichts verlässt deinen Rechner.
 *   **Low-RAM Optimierung:** Durch die Nutzung von **IndexedDB** können tausende Bilder sortiert werden, ohne dass der Browser abstürzt oder der Arbeitsspeicher voll läuft.
-*   **Workflow-Speed:** Volle Tastatur-Unterstützung (`S`, `N`, `Z`) für blitzschnelles Sortieren.
-*   **Strukturierter Export:** Automatischer Download als ZIP-Archiv mit fertiger Ordnerstruktur (`sfw/` und `nsfw/`).
+*   **Workflow-Speed:** Volle Tastatur-Unterstützung (`Pfeiltasten`, `Backspace`) für blitzschnelles Sortieren.
+*   **Strukturierter Export:** Download als ZIP oder direkt als **Sortier-Skript** (.bat / .sh) für deinen PC.
 
 ### 🛠️ Quick Links
-[**🚀 Anwendung starten**](https://cali72mero.github.io/bild-sortierung/) | [**⚖️ Lizenz lesen**](./LICENSE)
+[**🚀 Anwendung jetzt testen**](https://cali72mero.github.io/image-sorting/) | [**⚖️ Lizenz lesen**](./LICENSE)
 
 ### ⚠️ Lizenz & Einschränkungen
 Dieses Programm ist **keine** Open-Source-Software im klassischen Sinne.
@@ -47,12 +47,12 @@ Dieses Programm ist **keine** Open-Source-Software im klassischen Sinne.
 
 ### 🚀 Key Features
 *   **Zero-Upload Policy:** All images are processed locally within your browser. Nothing is ever uploaded to a server.
-*   **Low-RAM Optimization:** Uses **IndexedDB** to handle thousands of images efficiently without crashing your browser or exhausting system memory.
-*   **Workflow Speed:** Full keyboard support (`S`, `N`, `Z`) for lightning-fast sorting.
-*   **Structured Export:** Automatic download as a ZIP archive with pre-defined folder structures (`sfw/` and `nsfw/`).
+*   **Low-RAM Optimization:** Efficiently handle thousands of images without crashing your browser or exhausting system memory.
+*   **Workflow Speed:** Full keyboard support (`Arrow Keys`, `Backspace`) for lightning-fast sorting.
+*   **Structured Export:** Download as ZIP or as a **Sorting Script** (.bat / .sh) for your local machine.
 
 ### 🛠️ Quick Links
-[**🚀 Launch Application**](https://cali72mero.github.io/bild-sortierung/) | [**⚖️ View License**](./LICENSE)
+[**🚀 Test Application now**](https://cali72mero.github.io/image-sorting/) | [**⚖️ View License**](./LICENSE)
 
 ### ⚠️ License & Restrictions
 This software is **not** traditional open-source software.
