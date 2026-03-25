@@ -11,6 +11,8 @@
             --panel: #111;
             --text: #eee;
             --accent: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
             --border: #222;
         }
 
@@ -20,104 +22,70 @@
             background-color: var(--bg);
             color: var(--text);
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
             overflow: hidden;
         }
 
-        /* --- UI Header --- */
+        /* --- Header & Stats --- */
         header {
-            height: 60px;
-            background: var(--panel);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 10;
+            height: 60px; background: var(--panel); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
         }
-
         .stats-area { display: flex; gap: 20px; font-size: 0.85rem; color: #888; }
         .stats-area b { color: var(--text); }
 
-        /* --- Center Image Area --- */
-        #main-view {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            background: #000;
-            overflow: hidden;
-        }
+        /* --- View Area --- */
+        #main-view { flex: 1; display: flex; align-items: center; justify-content: center; background: #000; overflow: hidden; }
+        #active-img { max-width: 100%; max-height: 100%; object-fit: contain; display: none; }
 
-        #active-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            display: none;
-            transition: opacity 0.1s;
-        }
-
-        /* --- Bottom Control Bar --- */
+        /* --- Footer Controls --- */
         footer {
-            min-height: 100px;
-            background: var(--panel);
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            padding: 10px 20px;
-            z-index: 10;
+            min-height: 120px; background: var(--panel); border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px 20px;
         }
-
         .btn {
-            padding: 12px 25px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            color: #fff;
-            transition: transform 0.1s, filter 0.2s;
-            min-width: 120px;
-            text-transform: uppercase;
-            font-size: 0.9rem;
+            padding: 12px 25px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer;
+            color: #fff; transition: transform 0.1s, filter 0.2s; min-width: 130px; text-transform: uppercase; font-size: 0.9rem;
         }
         .btn:active { transform: scale(0.95); }
         .btn:disabled { opacity: 0.1; cursor: not-allowed; }
         .btn-undo { background: #333; }
-        .btn-reset { background: transparent; color: #555; border: 1px solid #333; padding: 5px 10px; min-width: auto; }
+        .btn-reset { background: transparent; color: #555; border: 1px solid #333; padding: 5px 15px; min-width: auto; font-size: 0.75rem; }
+        .btn-reset:hover { border-color: var(--accent-red); color: var(--accent-red); }
 
         /* --- Setup Screen --- */
         #setup-screen {
             position: fixed; inset: 0; background: var(--bg); z-index: 100;
-            display: flex; align-items: center; justify-content: center;
-            padding: 20px;
+            display: flex; align-items: center; justify-content: center; padding: 20px;
         }
-        .setup-card {
-            background: var(--panel); border: 1px solid var(--border);
-            padding: 40px; border-radius: 15px; max-width: 600px; width: 100%;
-        }
-        .setup-card h1 { margin-bottom: 10px; font-size: 1.8rem; }
-        .category-input {
-            display: flex; gap: 10px; margin-bottom: 10px;
-        }
-        input[type="text"] {
-            flex: 1; background: #000; border: 1px solid #333; color: #fff;
-            padding: 12px; border-radius: 6px; outline: none;
-        }
-        .warning { color: #f59e0b; font-size: 0.8rem; margin-top: 10px; display: none; }
+        .setup-card { background: var(--panel); border: 1px solid var(--border); padding: 40px; border-radius: 15px; max-width: 600px; width: 100%; }
+        .category-input { display: flex; gap: 10px; margin-bottom: 10px; }
+        input[type="text"] { flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 6px; outline: none; }
 
-        /* --- Export Modal --- */
+        /* --- Export Modal GUI --- */
         #export-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200;
-            display: none; align-items: center; justify-content: center;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 200;
+            display: none; align-items: center; justify-content: center; padding: 20px;
         }
-        .modal-content {
-            background: var(--panel); padding: 40px; border-radius: 20px; text-align: center;
-            max-width: 500px; border: 1px solid var(--accent);
+        .export-container {
+            background: var(--panel); border: 1px solid var(--accent); border-radius: 24px;
+            max-width: 900px; width: 100%; padding: 40px; display: flex; flex-direction: column; gap: 30px;
         }
+        .export-header { text-align: center; }
+        .export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        
+        .export-card {
+            background: #181818; border: 1px solid #333; border-radius: 16px; padding: 25px;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        .export-card.recommended { border-color: var(--accent-green); position: relative; }
+        .badge {
+            position: absolute; top: -12px; right: 20px; background: var(--accent-green);
+            color: #000; font-size: 0.7rem; font-weight: 900; padding: 4px 12px; border-radius: 20px;
+        }
+        
+        .guide-box { background: #000; padding: 15px; border-radius: 10px; font-size: 0.8rem; color: #aaa; line-height: 1.4; }
+        .guide-box b { color: #fff; }
 
         .hidden { display: none !important; }
     </style>
@@ -142,7 +110,6 @@
         </div>
 
         <button class="btn btn-undo" style="background: #222; margin-bottom: 20px;" onclick="addCategoryRow()">+ Weiteren Ordner hinzufügen</button>
-        <div id="setup-warning" class="warning">Hinweis: Mehr als 4 Ordner könnten unübersichtlich werden, aber es ist möglich.</div>
 
         <div style="margin-top: 30px; border-top: 1px solid #222; padding-top: 20px;">
             <p style="margin-bottom: 15px; font-weight: bold;">Schritt 2: Ordner auswählen</p>
@@ -159,16 +126,12 @@
         <span>Offen: <b id="s-open">0</b></span>
         <div id="dynamic-stats" style="display: flex; gap: 15px; margin-left: 20px;"></div>
     </div>
-    <button class="btn btn-reset" onclick="location.reload()">Daten löschen / Reset</button>
+    <button class="btn btn-reset" onclick="fullWipe()">Daten & Cache löschen</button>
 </header>
 
 <!-- MAIN VIEW -->
 <div id="main-view">
     <img id="active-img" alt="Sorting View">
-    <div id="welcome-text" style="text-align: center;">
-        <h2 style="font-size: 2rem;">Alles sortiert!</h2>
-        <p style="color: #666; margin-top: 10px;">Nutze die Export-Optionen unten.</p>
-    </div>
 </div>
 
 <!-- FOOTER -->
@@ -179,50 +142,64 @@
 
 <!-- EXPORT MODAL -->
 <div id="export-modal">
-    <div class="modal-content">
-        <h2 style="margin-bottom: 10px;">Sortierung abgeschlossen!</h2>
-        <p style="color: #888; margin-bottom: 30px;">Wähle dein Export-Format. Große Mengen werden automatisch in Chunks aufgeteilt.</p>
-        
-        <button class="btn" style="background: #22c55e; width: 100%;" onclick="exportZip()">Als ZIP herunterladen</button>
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button class="btn" style="background: #333; flex: 1;" onclick="exportScript('bat')">Windows (.bat)</button>
-            <button class="btn" style="background: #333; flex: 1;" onclick="exportScript('sh')">Mac/Linux (.sh)</button>
+    <div class="export-container">
+        <div class="export-header">
+            <h1 style="font-size: 2rem;">Sortierung abgeschlossen! 🎉</h1>
+            <p style="color: #888; margin-top: 5px;">Wähle die beste Methode, um deine Bilder zu speichern.</p>
         </div>
-        <button class="btn btn-reset" style="margin-top: 20px; width: 100%;" onclick="location.reload()">Neue Sortierung</button>
+
+        <div class="export-grid">
+            <div class="export-card recommended">
+                <div class="badge">BESTE OPTION</div>
+                <h3>Physisch Verschieben</h3>
+                <p style="font-size: 0.85rem; color: #888;">Verschiebt Bilder direkt auf deiner Festplatte. Schnell & Platzsparend.</p>
+                <div class="guide-box">
+                    1. Skript laden.<br>
+                    2. Datei <b>neben</b> den Bilder-Ordner legen.<br>
+                    3. Doppelklick zum Starten.
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" style="background: #333; flex: 1;" onclick="exportScript('bat')">Windows</button>
+                    <button class="btn" style="background: #333; flex: 1;" onclick="exportScript('sh')">Mac/Linux</button>
+                </div>
+            </div>
+
+            <div class="export-card">
+                <h3>ZIP-Archiv Download</h3>
+                <p style="font-size: 0.85rem; color: #888;">Erstellt Kopien in einer ZIP. Gut für Cloud-Backups.</p>
+                <div class="guide-box">
+                    Max. <b>500MB / 250 Bilder</b> pro ZIP.<br>
+                    Bei großen Mengen entstehen mehrere Parts (1, 2...).
+                </div>
+                <button class="btn" style="background: var(--accent); margin-top: auto;" onclick="exportZip()">ZIP herunterladen</button>
+            </div>
+        </div>
+
+        <button class="btn btn-reset" style="align-self: center;" onclick="fullWipe()">Sortierung beenden & Cache leeren</button>
     </div>
 </div>
 
 <script>
-    /* --- State --- */
     let files = [];
-    let categories = []; // { name, key, color }
-    let decisions = {}; // path -> categoryName
+    let categories = [];
+    let decisions = {};
     let history = [];
     let currentIndex = -1;
     let currentObjectUrl = null;
-
     const COLORS = ['#22c55e', '#ef4444', '#3b82f6', '#a855f7', '#eab308', '#ec4899'];
 
-    /* --- Setup Logic --- */
     function addCategoryRow() {
         const list = document.getElementById('category-list');
-        const count = list.children.length;
-        if (count >= 4) document.getElementById('setup-warning').style.display = 'block';
-
         const div = document.createElement('div');
         div.className = 'category-input';
-        div.innerHTML = `
-            <input type="text" placeholder="Ordnername ${count + 1}">
-            <input type="text" placeholder="Taste" value="${count + 1}" style="max-width: 60px; text-align: center;">
-        `;
+        div.innerHTML = `<input type="text" placeholder="Ordnername ${list.children.length + 1}">
+                         <input type="text" placeholder="Taste" value="${list.children.length + 1}" style="max-width: 60px; text-align: center;">`;
         list.appendChild(div);
     }
 
     async function startSorting(e) {
         const rawFiles = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-        if (!rawFiles.length) return alert("Keine Bilder im Ordner gefunden!");
-
-        // Parse Categories
+        if (!rawFiles.length) return alert("Keine Bilder gefunden!");
         const rows = document.querySelectorAll('.category-input');
         categories = [];
         rows.forEach((row, i) => {
@@ -230,150 +207,115 @@
             const key = row.children[1].value.trim().toLowerCase();
             if (name) categories.push({ name, key, color: COLORS[i % COLORS.length] });
         });
-
-        if (!categories.length) return alert("Bitte mindestens einen Ordner definieren!");
-
         files = rawFiles;
         document.getElementById('setup-screen').style.display = 'none';
         buildUI();
         findNext();
     }
 
-    /* --- UI Building --- */
     function buildUI() {
         const btnContainer = document.getElementById('dynamic-buttons');
         const statContainer = document.getElementById('dynamic-stats');
-        btnContainer.innerHTML = '';
-        statContainer.innerHTML = '';
-
+        btnContainer.innerHTML = ''; statContainer.innerHTML = '';
         categories.forEach(cat => {
-            // Stats
-            const s = document.createElement('span');
-            s.innerHTML = `${cat.name}: <b id="stat-${cat.name}">0</b>`;
+            const s = document.createElement('span'); s.innerHTML = `${cat.name}: <b id="stat-${cat.name}">0</b>`;
             statContainer.appendChild(s);
-
-            // Buttons
-            const b = document.createElement('button');
-            b.className = 'btn';
-            b.style.backgroundColor = cat.color;
-            b.innerText = `${cat.name} (${cat.key.toUpperCase()})`;
-            b.onclick = () => decide(cat.name);
+            const b = document.createElement('button'); b.className = 'btn'; b.style.backgroundColor = cat.color;
+            b.innerText = `${cat.name} (${cat.key.toUpperCase()})`; b.onclick = () => decide(cat.name);
             btnContainer.appendChild(b);
         });
-
         document.getElementById('s-total').innerText = files.length;
         updateStats();
     }
 
-    /* --- Core Engine --- */
     function findNext() {
         if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
-
         currentIndex = files.findIndex(f => !decisions[f.webkitRelativePath]);
         const img = document.getElementById('active-img');
-        const welcome = document.getElementById('welcome-text');
-
         if (currentIndex !== -1) {
             currentObjectUrl = URL.createObjectURL(files[currentIndex]);
-            img.src = currentObjectUrl;
-            img.style.display = 'block';
-            welcome.style.display = 'none';
+            img.src = currentObjectUrl; img.style.display = 'block';
         } else {
             img.style.display = 'none';
-            welcome.style.display = 'block';
             document.getElementById('export-modal').style.display = 'flex';
         }
     }
 
     function decide(categoryName) {
         if (currentIndex === -1) return;
-        const path = files[currentIndex].webkitRelativePath;
-        decisions[path] = categoryName;
-        history.push(currentIndex);
-        updateStats();
-        findNext();
+        decisions[files[currentIndex].webkitRelativePath] = categoryName;
+        history.push(currentIndex); updateStats(); findNext();
     }
 
     function undo() {
         if (!history.length) return;
-        const lastIdx = history.pop();
-        delete decisions[files[lastIdx].webkitRelativePath];
-        updateStats();
-        findNext();
+        delete decisions[files[history.pop()].webkitRelativePath];
+        updateStats(); findNext();
     }
 
     function updateStats() {
         const solved = Object.keys(decisions).length;
         document.getElementById('s-open').innerText = files.length - solved;
-
         categories.forEach(cat => {
-            const count = Object.values(decisions).filter(v => v === cat.name).length;
-            document.getElementById(`stat-${cat.name}`).innerText = count;
+            document.getElementById(`stat-${cat.name}`).innerText = Object.values(decisions).filter(v => v === cat.name).length;
         });
     }
 
-    /* --- Export Logic --- */
     async function exportZip() {
         const sorted = files.filter(f => decisions[f.webkitRelativePath]);
-        const CHUNK_LIMIT = 300; // Chunking by file count to avoid browser crash
-        
-        for (let i = 0; i < sorted.length; i += CHUNK_LIMIT) {
+        const LIMIT = 250; 
+        for (let i = 0; i < sorted.length; i += LIMIT) {
             const zip = new JSZip();
-            const chunk = sorted.slice(i, i + CHUNK_LIMIT);
-            
-            chunk.forEach(f => {
-                const folderName = decisions[f.webkitRelativePath];
-                zip.folder(folderName).file(f.webkitRelativePath, f);
-            });
-
+            const chunk = sorted.slice(i, i + LIMIT);
+            chunk.forEach(f => zip.folder(decisions[f.webkitRelativePath]).file(f.webkitRelativePath, f));
             const blob = await zip.generateAsync({ type: "blob" });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `part_${Math.floor(i/CHUNK_LIMIT) + 1}_of_sorted_images.zip`;
+            a.href = URL.createObjectURL(blob);
+            a.download = `part_${Math.floor(i/LIMIT) + 1}_of_sorted.zip`;
             a.click();
-            URL.revokeObjectURL(url);
         }
     }
 
     function exportScript(type) {
         let content = type === 'bat' ? "@echo off\r\n" : "#!/bin/bash\n";
-        categories.forEach(c => {
-            content += type === 'bat' ? `mkdir "${c.name}" 2>nul\r\n` : `mkdir -p "${c.name}"\n`;
-        });
-
+        categories.forEach(c => content += type === 'bat' ? `mkdir "${c.name}" 2>nul\r\n` : `mkdir -p "${c.name}"\n`);
         files.forEach(f => {
             const tag = decisions[f.webkitRelativePath];
             if (!tag) return;
-            const path = f.webkitRelativePath;
-            if (type === 'bat') {
-                content += `move "${path}" "${tag}\\${path}"\r\n`;
-            } else {
-                content += `mkdir -p "${tag}/$(dirname "${path}")"\n`;
-                content += `mv "${path}" "${tag}/${path}"\n`;
-            }
+            if (type === 'bat') content += `move "${f.webkitRelativePath}" "${tag}\\${f.webkitRelativePath}"\r\n`;
+            else content += `mkdir -p "${tag}/$(dirname "${f.webkitRelativePath}")"\nmv "${f.webkitRelativePath}" "${tag}/${f.webkitRelativePath}"\n`;
         });
-
-        const blob = new Blob([content], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = `move_files.${type}`;
-        a.click();
+        a.href = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
+        a.download = `sort_files.${type}`; a.click();
     }
 
-    /* --- Events --- */
+    /* --- FULL WIPE FUNCTION --- */
+    async function fullWipe() {
+        if (!confirm("Möchtest du alle Daten löschen und den Browser-Speicher leeren?")) return;
+        
+        // 1. Clear IndexedDB
+        const dbs = await window.indexedDB.databases();
+        dbs.forEach(db => window.indexedDB.deleteDatabase(db.name));
+        
+        // 2. Clear Storage
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // 3. Revoke URLs
+        if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+        
+        // 4. Reload
+        location.reload();
+    }
+
     window.addEventListener('keydown', (e) => {
         if (currentIndex === -1) return;
-        const k = e.key.toLowerCase();
-        if (k === 'backspace') return undo();
-        
-        const cat = categories.find(c => c.key === k);
+        if (e.key.toLowerCase() === 'backspace') return undo();
+        const cat = categories.find(c => c.key === e.key.toLowerCase());
         if (cat) decide(cat.name);
     });
-
     document.getElementById('file-loader').addEventListener('change', startSorting);
-
 </script>
 </body>
 </html>
