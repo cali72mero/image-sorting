@@ -1,8 +1,8 @@
 # 🖼️ Image Sorter Pro
 **High-Performance Local Image Categorization Tool**
 
-[![Version](https://img.shields.io/badge/Version-0.1--beta-blue?style=for-the-badge)](https://github.com/cali72mero/image-sorting)
-[![License](https://img.shields.io/badge/License-Restricted-red?style=for-the-badge)](#lizenz--license)
+[![Version](https://img.shields.io/badge/Version-0.1--beta-blue?style=for-the-badge)](https://cali72mero.github.io/image-sorting/)
+[![License](https://img.shields.io/badge/License-Restricted-red?style=for-the-badge)](./LICENSE)
 [![Status](https://img.shields.io/badge/Status-Active%20Development-green?style=for-the-badge)](#)
 
 ---
