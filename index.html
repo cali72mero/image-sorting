@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bild-Sortierer Pro v0.1 beta</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-sfw: #4caf50;
+            --accent-nsfw: #f44336;
+            --accent-neutral: #2196f3;
+            --accent-gray: #555;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Header Bereich --- */
+        header {
+            padding: 1rem 1.5rem;
+            background-color: var(--container-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .stats { display: flex; gap: 20px; font-size: 0.9rem; }
+        .lang-switch {
+            cursor: pointer;
+            padding: 4px 8px;
+            border: 1px solid var(--accent-neutral);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--accent-neutral);
+            font-weight: bold;
+        }
+
+        /* --- Haupt-Layout --- */
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .viewer-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        #current-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .placeholder-text {
+            text-align: center;
+            color: #888;
+        }
+
+        /* --- Sidebar / Controls --- */
+        .controls-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 300px;
+        }
+
+        .card {
+            background: var(--container-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .btn:active { transform: scale(0.98); }
+        .btn:hover { filter: brightness(1.1); }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .btn-sfw { background-color: var(--accent-sfw); }
+        .btn-nsfw { background-color: var(--accent-nsfw); }
+        .btn-neutral { background-color: var(--accent-neutral); }
+        .btn-danger { background-color: var(--accent-gray); }
+
+        .upload-area {
+            border: 2px dashed #444;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .upload-area:hover { border-color: var(--accent-neutral); }
+
+        .shortcuts-info {
+            margin-top: auto;
+            padding: 10px;
+            font-size: 0.8rem;
+            color: #666;
+            text-align: center;
+        }
+
+        /* --- Loader --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid var(--accent-neutral);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-left">
+        <strong>Bild-Sortierer Pro</strong> <small style="color: #666;">v0.1 beta</small>
+        <div id="lang-btn" class="lang-switch" onclick="toggleLanguage()">EN</div>
+    </div>
+    
+    <div class="stats">
+        <span data-t="stat_total">Gesamt</span>: <span id="stat-total">0</span>
+        <span data-t="stat_open">Offen</span>: <span id="stat-remaining">0</span>
+        <span>SFW: <span id="stat-sfw">0</span></span>
+        <span>NSFW: <span id="stat-nsfw">0</span></span>
+    </div>
+
+    <button class="btn-danger" onclick="clearData()" style="padding: 5px 10px; font-size: 0.7rem; border-radius: 4px; border: none; cursor: pointer; color: white;" data-t="btn_clear">Daten löschen</button>
+</header>
+
+<div class="main-container">
+    <div class="viewer-section">
+        <div id="empty-msg" class="placeholder-text">
+            <h2 data-t="welcome_h">Willkommen!</h2>
+            <p data-t="welcome_p">Wähle einen Ordner aus, um zu starten.</p>
+        </div>
+        <img id="current-image" style="display: none;">
+    </div>
+
+    <div class="sidebar">
+        <div class="controls-section">
+            <div class="card">
+                <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                    <p data-t="upload_text" style="margin: 0;">Ordner hochladen</p>
+                    <input type="file" id="file-input" webkitdirectory directory multiple style="display: none;">
+                </div>
+            </div>
+
+            <div class="card">
+                <button id="btn-sfw" class="btn btn-sfw" onclick="saveTag('sfw')" disabled data-t="btn_sfw">SFW (S)</button>
+                <button id="btn-nsfw" class="btn btn-nsfw" onclick="saveTag('nsfw')" disabled data-t="btn_nsfw">NSFW (N)</button>
+                <button id="btn-undo" class="btn btn-danger" onclick="undo()" disabled data-t="btn_undo">Rückgängig (Z)</button>
+            </div>
+
+            <div class="card" style="margin-top: auto;">
+                <button id="btn-zip" class="btn btn-neutral" onclick="exportZip()" disabled data-t="btn_zip">ZIP Herunterladen</button>
+                <div class="shortcuts-info">
+                    S = SFW | N = NSFW | Z = Undo<br>
+                    <span data-t="info_ram">Optimiert für wenig RAM</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p id="loading-text" style="margin-top: 20px;">Lade...</p>
+</div>
+
+<script>
+    /* --- Konfiguration & Sprache --- */
+    let currentLang = 'de';
+    const i18n = {
+        de: {
+            stat_total: "Gesamt", stat_open: "Offen", btn_clear: "Daten löschen",
+            welcome_h: "Bereit zum Sortieren", welcome_p: "Wähle einen Ordner mit Bildern aus.",
+            upload_text: "Ordner auswählen", btn_sfw: "SFW (S)", btn_nsfw: "NSFW (N)",
+            btn_undo: "Rückgängig (Z)", btn_zip: "ZIP Herunterladen",
+            info_ram: "Optimiert für wenig RAM", done_h: "Alles erledigt!",
+            done_p: "Alle Bilder sind sortiert. Du kannst das ZIP jetzt laden.",
+            msg_load: "Bilder werden eingelesen...", msg_zip: "ZIP wird erstellt...",
+            confirm: "Möchtest du wirklich alle Daten löschen?"
+        },
+        en: {
+            stat_total: "Total", stat_open: "Open", btn_clear: "Clear Data",
+            welcome_h: "Ready to sort", welcome_p: "Select a folder containing images.",
+            upload_text: "Select Folder", btn_sfw: "SFW (S)", btn_nsfw: "NSFW (N)",
+            btn_undo: "Undo (Z)", btn_zip: "Download ZIP",
+            info_ram: "Low RAM optimization", done_h: "All done!",
+            done_p: "All images are sorted. You can download the ZIP now.",
+            msg_load: "Processing images...", msg_zip: "Creating ZIP...",
+            confirm: "Are you sure you want to clear all data?"
+        }
+    };
+
+    /* --- Datenbank & Logik --- */
+    let db;
+    let images = [];
+    let currentIdx = -1;
+    let history = [];
+
+    const initDB = () => {
+        const req = indexedDB.open("ImageSorterDB", 1);
+        req.onupgradeneeded = (e) => {
+            const d = e.target.result;
+            if (!d.objectStoreNames.contains("images")) {
+                d.createObjectStore("images", { keyPath: "id", autoIncrement: true });
+            }
+        };
+        req.onsuccess = (e) => {
+            db = e.target.result;
+            loadFromDB();
+        };
+    };
+
+    async function handleFiles(e) {
+        const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+        if (!files.length) return;
+
+        showLoader(true, i18n[currentLang].msg_load);
+        const tx = db.transaction("images", "readwrite");
+        const store = tx.objectStore("images");
+
+        for (const f of files) {
+            store.add({ name: f.name, data: f, tag: null });
+        }
+        
+        tx.oncomplete = () => {
+            loadFromDB();
+            showLoader(false);
+        };
+    }
+
+    function loadFromDB() {
+        const tx = db.transaction("images", "readonly");
+        const req = tx.objectStore("images").getAll();
+        req.onsuccess = () => {
+            images = req.result;
+            updateStats();
+            findNext();
+        };
+    }
+
+    function findNext() {
+        currentIdx = images.findIndex(img => img.tag === null);
+        const imgEl = document.getElementById('current-image');
+        const empty = document.getElementById('empty-msg');
+
+        if (currentIdx !== -1) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imgEl.src = e.target.result;
+                imgEl.style.display = 'block';
+                empty.style.display = 'none';
+            };
+            reader.readAsDataURL(images[currentIdx].data);
+            setControls(false);
+        } else {
+            imgEl.style.display = 'none';
+            empty.style.display = 'block';
+            if (images.length > 0) {
+                empty.querySelector('h2').innerText = i18n[currentLang].done_h;
+                empty.querySelector('p').innerText = i18n[currentLang].done_p;
+            }
+            setControls(true);
+        }
+    }
+
+    function saveTag(tag) {
+        if (currentIdx === -1) return;
+        const img = images[currentIdx];
+        img.tag = tag;
+        history.push(currentIdx);
+
+        const tx = db.transaction("images", "readwrite");
+        tx.objectStore("images").put(img);
+        
+        updateStats();
+        findNext();
+    }
+
+    function undo() {
+        if (!history.length) return;
+        const idx = history.pop();
+        images[idx].tag = null;
+        
+        const tx = db.transaction("images", "readwrite");
+        tx.objectStore("images").put(images[idx]);
+
+        updateStats();
+        findNext();
+    }
+
+    async function exportZip() {
+        showLoader(true, i18n[currentLang].msg_zip);
+        const zip = new JSZip();
+        const sfw = zip.folder("sfw");
+        const nsfw = zip.folder("nsfw");
+
+        images.forEach(img => {
+            if (img.tag === 'sfw') sfw.file(img.name, img.data);
+            if (img.tag === 'nsfw') nsfw.file(img.name, img.data);
+        });
+
+        const blob = await zip.generateAsync({ type: "blob" });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `sorted_images_${Date.now()}.zip`;
+        a.click();
+        showLoader(false);
+    }
+
+    /* --- UI Hilfsfunktionen --- */
+    function updateStats() {
+        document.getElementById('stat-total').innerText = images.length;
+        document.getElementById('stat-remaining').innerText = images.filter(i => i.tag === null).length;
+        document.getElementById('stat-sfw').innerText = images.filter(i => i.tag === 'sfw').length;
+        document.getElementById('stat-nsfw').innerText = images.filter(i => i.tag === 'nsfw').length;
+        document.getElementById('btn-zip').disabled = !images.some(i => i.tag !== null);
+    }
+
+    function setControls(disabled) {
+        document.getElementById('btn-sfw').disabled = disabled;
+        document.getElementById('btn-nsfw').disabled = disabled;
+        document.getElementById('btn-undo').disabled = !history.length;
+    }
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'de' ? 'en' : 'de';
+        document.getElementById('lang-btn').innerText = currentLang.toUpperCase();
+        document.querySelectorAll('[data-t]').forEach(el => {
+            const key = el.getAttribute('data-t');
+            el.innerText = i18n[currentLang][key];
+        });
+        findNext();
+    }
+
+    function showLoader(show, text) {
+        const l = document.getElementById('loading-overlay');
+        l.style.display = show ? 'flex' : 'none';
+        document.getElementById('loading-text').innerText = text;
+    }
+
+    function clearData() {
+        if (confirm(i18n[currentLang].confirm)) {
+            const tx = db.transaction("images", "readwrite");
+            tx.objectStore("images").clear();
+            tx.oncomplete = () => location.reload();
+        }
+    }
+
+    /* --- Init --- */
+    document.getElementById('file-input').addEventListener('change', handleFiles);
+    window.addEventListener('keydown', (e) => {
+        if (currentIdx === -1) return;
+        const k = e.key.toLowerCase();
+        if (k === 's') saveTag('sfw');
+        if (k === 'n') saveTag('nsfw');
+        if (k === 'z') undo();
+    });
+
+    initDB();
+</script>
+
+</body>
+</html>
