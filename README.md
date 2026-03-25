@@ -1,34 +1,65 @@
-# Image Sorter Pro (Bilingual DE/EN)
-**Version:** 0.1 Beta  
-**Developer:** Milos Lossarek  
-**Status:** In Development / In Entwicklung
+# 🖼️ Image Sorter Pro
+**High-Performance Local Image Categorization Tool**
+
+[![Version](https://img.shields.io/badge/Version-0.1--beta-blue?style=for-the-badge)](https://github.com/cali72mero/bild-sortierung)
+[![License](https://img.shields.io/badge/License-Restricted-red?style=for-the-badge)](#lizenz--license)
+[![Status](https://img.shields.io/badge/Status-Active%20Development-green?style=for-the-badge)](#)
 
 ---
 
-## 🇩🇪 Deutsch (German)
+### 🌐 Sprache wählen / Choose Language
+[**🇩🇪 Deutsch**](#-deutsch) | [**🇺🇸 English**](#-english)
 
-### Was ist das?
-Image Sorter Pro ist ein schlankes, lokales Tool zum Sortieren von großen Bildmengen in die Kategorien SFW und NSFW. Es wurde entwickelt, um auch auf Rechnern mit wenig Arbeitsspeicher flüssig zu laufen.
+---
 
-### Warum dieses Tool?
-- **Sicher:** Deine Bilder werden niemals auf einen Server hochgeladen.
-- **Effizient:** Nutzt IndexedDB für schnelles Laden tausender Bilder.
-- **Benutzerfreundlich:** Mit Tastatur-Shortcuts und klarer Anzeige des Fortschritts.
+## 🇩🇪 Deutsch
 
-### Lizenz-Hinweis
-Die Nutzung ist auf lokale Instanzen oder die offizielle GitHub-Seite beschränkt. Modifikationen am Code sowie kommerzielles Hosting durch Dritte sind untersagt.
+### 📝 Über das Projekt
+**Image Sorter Pro** ist eine spezialisierte Web-Anwendung zur schnellen Kategorisierung großer Bildmengen in **SFW** (Safe For Work) und **NSFW** (Not Safe For Work). Das Tool wurde entwickelt, um maximale Privatsphäre mit extrem hoher Geschwindigkeit zu kombinieren.
+
+**Release-Datum:** 25. März 2026  
+**Entwickler:** cali72mero
+
+### 🚀 Hauptfunktionen
+*   **Zero-Upload-Policy:** Alle Bilder werden rein lokal in deinem Browser verarbeitet. Nichts verlässt deinen Rechner.
+*   **Low-RAM Optimierung:** Durch die Nutzung von **IndexedDB** können tausende Bilder sortiert werden, ohne dass der Browser abstürzt oder der Arbeitsspeicher voll läuft.
+*   **Workflow-Speed:** Volle Tastatur-Unterstützung (`S`, `N`, `Z`) für blitzschnelles Sortieren.
+*   **Strukturierter Export:** Automatischer Download als ZIP-Archiv mit fertiger Ordnerstruktur (`sfw/` und `nsfw/`).
+
+### 🛠️ Quick Links
+[**🚀 Anwendung starten**](https://cali72mero.github.io/bild-sortierung/) | [**⚖️ Lizenz lesen**](./LICENSE)
+
+### ⚠️ Lizenz & Einschränkungen
+Dieses Programm ist **keine** Open-Source-Software im klassischen Sinne.
+1. Die Nutzung ist nur lokal oder über die offizielle GitHub-Seite gestattet.
+2. **Modifikationen** am Code sind untersagt.
+3. **Kommerzielles Hosting** (Anbieten der Seite gegen Geld) ist strengstens verboten.
 
 ---
 
 ## 🇺🇸 English
 
-### What is it?
-Image Sorter Pro is a lightweight, local tool for sorting large amounts of images into SFW and NSFW categories. It's built to run smoothly even on machines with limited RAM.
+### 📝 About the Project
+**Image Sorter Pro** is a specialized web application for rapidly categorizing large sets of images into **SFW** (Safe For Work) and **NSFW** (Not Safe For Work). This tool was built to combine maximum privacy with extreme processing speed.
 
-### Why use it?
-- **Secure:** Your images are never uploaded to a server. Everything stays on your machine.
-- **Efficient:** Uses IndexedDB for lightning-fast handling of thousands of files.
-- **User-Centric:** Includes keyboard shortcuts and clear progress tracking.
+**Release Date:** March 25, 2026  
+**Developer:** cali72mero
 
-### License Notice
-Usage is restricted to local instances or the official GitHub page. Modification of the code and commercial hosting by third parties is prohibited.
+### 🚀 Key Features
+*   **Zero-Upload Policy:** All images are processed locally within your browser. Nothing is ever uploaded to a server.
+*   **Low-RAM Optimization:** Uses **IndexedDB** to handle thousands of images efficiently without crashing your browser or exhausting system memory.
+*   **Workflow Speed:** Full keyboard support (`S`, `N`, `Z`) for lightning-fast sorting.
+*   **Structured Export:** Automatic download as a ZIP archive with pre-defined folder structures (`sfw/` and `nsfw/`).
+
+### 🛠️ Quick Links
+[**🚀 Launch Application**](https://cali72mero.github.io/bild-sortierung/) | [**⚖️ View License**](./LICENSE)
+
+### ⚠️ License & Restrictions
+This software is **not** traditional open-source software.
+1. Usage is restricted to local instances or the official GitHub Pages site.
+2. **Modifications** to the source code are prohibited.
+3. **Commercial Hosting** (offering the tool for a fee) is strictly forbidden.
+
+---
+
+**© 2026 cali72mero - All Rights Reserved.**
